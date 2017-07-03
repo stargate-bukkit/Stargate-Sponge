@@ -655,12 +655,6 @@ public class Stargate {
         }
         return format;
     }
-
-
-    
-
-    
-
     
     private class BlockPopulatorThread implements Runnable {
         @Override
