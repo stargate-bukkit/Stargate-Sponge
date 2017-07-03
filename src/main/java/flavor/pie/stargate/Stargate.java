@@ -691,7 +691,7 @@ public class Stargate {
             }
         }
     }
-
+    // TODO replace messages with i18n
     private class SGCommand implements CommandCallable {
         @Override
         public CommandResult process(CommandSource sender, String arg) throws CommandException {
@@ -709,7 +709,7 @@ public class Stargate {
                 Player p = (Player) sender;
                 if (!hasPerm(p, "stargate.admin") && !hasPerm(p, "stargate.admin.reload")) {
                     sendMessage(sender, "Permission Denied");
-                    CommandResult.success();
+                    return CommandResult.success();
                 }
             }
             if (args[0].equalsIgnoreCase("reload")) {
