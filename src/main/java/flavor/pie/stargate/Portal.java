@@ -1315,8 +1315,11 @@ public class Portal {
     public static void loadAllGates(World world) {
         String location = Stargate.getSaveLocation();
         
-        File db = new File(location, world.getName() + ".db");
-
+        File db = new File(location, world.getUniqueId() + ".db");
+        if (!db.exists()) {
+            db = new File(location, world.getName() + ".db");
+        }
+        
         if (db.exists()) {
             int l = 0;
             int portalCount = 0;
