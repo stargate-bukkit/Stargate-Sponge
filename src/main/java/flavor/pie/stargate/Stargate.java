@@ -248,10 +248,6 @@ public class Stargate {
         }
         
         Gate.loadGates(gateFolder);
-        // Replace nethergate.gate if it doesn't have an exit point.
-        if (Gate.getGateByName("nethergate.gate") == null || Gate.getGateByName("nethergate.gate").getExit() == null) {
-            Gate.populateDefaults(gateFolder);
-        }
         log.info("Loaded " + Gate.getGateCount() + " gate layouts");
         for (World world : Sponge.getServer().getWorlds()) {
             Portal.loadAllGates(world);
