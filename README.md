@@ -23,10 +23,10 @@ Stargates are portals that can be created for teleportation across long distance
 
 ## Pages
 
-* [Portals](https://ore.spongepowered.org/pie_flavor/Stargate-Sponge/pages/Portals)
-* [Gates](https://ore.spongepowered.org/pie_flavor/Stargate-Sponge/pages/Gates)
-* [Configuration](https://ore.spongepowered.org/pie_flavor/Stargate-Sponge/pages/Configuration)
-* [Permissions](https://ore.spongepowered.org/pie_flavor/Stargate-Sponge/pages/Permissions)
+* [Portals](https://ore.spongepowered.org/pie_flavor/Stargate/pages/Portals)
+* [Gates](https://ore.spongepowered.org/pie_flavor/Stargate/pages/Gates)
+* [Configuration](https://ore.spongepowered.org/pie_flavor/Stargate/pages/Configuration)
+* [Permissions](https://ore.spongepowered.org/pie_flavor/Stargate/pages/Permissions)
 
 ### Disclaimer
 
