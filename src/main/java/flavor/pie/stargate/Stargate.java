@@ -72,7 +72,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @SuppressWarnings("unused")
-@Plugin(id = "stargate", name = "Stargate", version = "0.1.0", authors = {"pie_flavor", "Dinnerbone", "Drakia"}, description = "The classic portal plugin, ported to Sponge.")
+@Plugin(id = "stargate", name = "Stargate", version = "0.1.1", authors = {"pie_flavor", "Dinnerbone", "Drakia"}, description = "The classic portal plugin, ported to Sponge.")
 public class Stargate {
     public static Logger log;
     private ConfigurationNode newConfig;
