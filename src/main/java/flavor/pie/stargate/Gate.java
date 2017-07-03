@@ -252,7 +252,6 @@ public class Gate {
                 BlockState id = types.get(layout[y][x]);
 
                 if (layout[y][x] == ENTRANCE || layout[y][x] == EXIT) {
-                    // TODO: Remove once snowmanTrailEvent is added
                     if (Stargate.ignoreEntrance) continue;
                     
                     BlockState type = topleft.modRelative(x, y, 0, modX, 1, modZ).getData();
