@@ -25,6 +25,7 @@ import com.google.common.collect.Iterables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -66,7 +67,7 @@ public class Gate {
     private BigDecimal destroyCost = null;
     private boolean toOwner = false;
 
-    public Gate(String filename, char[][] layout, HashMap<Character, BlockState> types) {
+    public  Gate(String filename, char[][] layout, HashMap<Character, BlockState> types) {
         this.filename = filename;
         this.layout = layout;
         this.types = types;
@@ -287,9 +288,21 @@ public class Gate {
                     }
                 } else if (id != null) {
                     Blox mod = topleft.modRelative(x, y, 0, modX, 1, modZ);
-                    if (!mod.getData().equals(id)) {
+                    if (!mod.getType().equals(id.getType())) {
                         Stargate.debug("Gate::Matches", "(" + mod.getX() + "," + mod.getY() + "," + mod.getZ() + ") Block Type Mismatch: " + mod.getType().getId() + " != " + id.getType().getId());
                         return false;
+                    } else {
+                        BlockState data = mod.getData();
+                        if (data.supports(Keys.DIRECTION)) {
+                            data = data.with(Keys.DIRECTION, id.get(Keys.DIRECTION).get()).get();
+                        }
+                        if (data.supports(Keys.AXIS)) {
+                            data = data.with(Keys.AXIS, id.get(Keys.AXIS).get()).get();
+                        }
+                        if (!data.equals(id)) {
+                            Stargate.debug("Gate::Matches", "(" + mod.getX() + "," + mod.getY() + "," + mod.getZ() + ") Block State Mismatch: " + data.getId() + " != " + id.getId());
+                            return false;
+                        }
                     }
                 }
             }
