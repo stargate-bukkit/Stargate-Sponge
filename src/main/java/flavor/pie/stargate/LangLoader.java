@@ -24,9 +24,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -34,18 +38,20 @@ import java.util.Set;
 public class LangLoader {
 	private String UTF8_BOM = "\uFEFF";
 	// Variables
-	private String datFolder;
+	private Path datFolder;
 	private String lang;
 	private HashMap<String, String> strList;
 	private HashMap<String, String> defList;
 	
-	public LangLoader(String datFolder, String lang) {
+	public LangLoader(Path datFolder, String lang) {
 		this.lang = lang;
 		this.datFolder = datFolder;
 		
-		File tmp = new File(datFolder, lang + ".txt");
-		if (!tmp.exists()) {
-			tmp.getParentFile().mkdirs();
+		Path tmp = datFolder.resolve(Paths.get(lang + ".txt"));
+		if (!Files.exists(tmp)) {
+			try {
+				Files.createDirectories(tmp.getParent());
+			} catch (IOException ignored) {}
 		}
 		updateLanguage(lang);
 		
@@ -128,7 +134,7 @@ public class LangLoader {
 			br.close();
 			
 			// Save file
-			fos = new FileOutputStream(datFolder + lang + ".txt");
+			fos = new FileOutputStream(datFolder.resolve(Paths.get(lang + ".txt")).toFile());
 			OutputStreamWriter out = new OutputStreamWriter(fos, "UTF8");
 			BufferedWriter bw = new BufferedWriter(out);
 			
@@ -166,7 +172,7 @@ public class LangLoader {
 		InputStreamReader isr;
 		try {
 			if (is == null) {
-				fis = new FileInputStream(datFolder + lang + ".txt");
+				fis = new FileInputStream(datFolder.resolve(Paths.get(lang + ".txt")).toFile());
 				isr = new InputStreamReader(fis, "UTF8");
 			} else {
 				isr = new InputStreamReader(is, "UTF8");

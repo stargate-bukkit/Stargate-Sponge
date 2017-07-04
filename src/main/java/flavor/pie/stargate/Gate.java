@@ -35,10 +35,16 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -50,7 +56,7 @@ public class Gate {
     private static HashMap<BlockState, ArrayList<Gate>> controlBlocks = new HashMap<>();
     private static HashSet<BlockState> frameBlocks = new HashSet<>();
 
-    private String filename;
+    private Path filename;
     private char[][] layout;
     private HashMap<Character, BlockState> types;
     private RelativeBlockVector[] entrances = new RelativeBlockVector[0];
@@ -67,7 +73,7 @@ public class Gate {
     private BigDecimal destroyCost = null;
     private boolean toOwner = false;
 
-    public  Gate(String filename, char[][] layout, HashMap<Character, BlockState> types) {
+    public Gate(Path filename, char[][] layout, HashMap<Character, BlockState> types) {
         this.filename = filename;
         this.layout = layout;
         this.types = types;
@@ -119,9 +125,9 @@ public class Gate {
         this.controls = controlList.toArray(this.controls);
     }
     
-    public void save(String gateFolder) {
+    public void save(Path gateFolder) throws IOException {
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(gateFolder + filename));
+            BufferedWriter bw = Files.newBufferedWriter(gateFolder.resolve(filename));
             
             writeConfig(bw, "portal-open", portalBlockOpen);
             writeConfig(bw, "portal-closed", portalBlockClosed);
@@ -204,8 +210,8 @@ public class Gate {
         return types.get('-');
     }
 
-    public String getFilename() {
-        return filename;
+    public Path getFilename() {
+        return filename.getFileName();
     }
 
     public BlockState getPortalBlockOpen() {
@@ -225,17 +231,17 @@ public class Gate {
     }
     
     public BigDecimal getUseCost() {
-        if (useCost == null) return iConomyHandler.useCost;
+        if (useCost == null) return Stargate.config.economy.useCost;
         return useCost;
     }
     
     public BigDecimal getCreateCost() {
-        if (createCost == null) return iConomyHandler.createCost;
+        if (createCost == null) return Stargate.config.economy.createCost;
         return createCost;
     }
     
     public BigDecimal getDestroyCost() {
-        if (destroyCost == null) return iConomyHandler.destroyCost;
+        if (destroyCost == null) return Stargate.config.economy.destroyCost;
         return destroyCost;
     }
     
@@ -253,7 +259,7 @@ public class Gate {
                 BlockState id = types.get(layout[y][x]);
 
                 if (layout[y][x] == ENTRANCE || layout[y][x] == EXIT) {
-                    if (Stargate.ignoreEntrance) continue;
+                    if (Stargate.config.portal.ignoreEntrance) continue;
                     
                     BlockState type = topleft.modRelative(x, y, 0, modX, 1, modZ).getData();
                     
@@ -312,7 +318,7 @@ public class Gate {
     }
 
     public static void registerGate(Gate gate) {
-        gates.put(gate.getFilename(), gate);
+        gates.put(gate.getFilename().toString(), gate);
 
         BlockState blockID = gate.getControlBlock();
 
@@ -323,7 +329,7 @@ public class Gate {
         controlBlocks.get(blockID).add(gate);
     }
 
-    public static Gate loadGate(File file) {
+    public static Gate loadGate(Path file) throws IOException {
         Scanner scanner = null;
         boolean designing = false;
         ArrayList<ArrayList<Character>> design = new ArrayList<>();
@@ -346,7 +352,7 @@ public class Gate {
 
                     for (char symbol : line.toCharArray()) {
                         if (symbol != '.' && symbol != ' ' && symbol != '*' && ((symbol == '?') || (!types.containsKey(symbol)))) {
-                            Stargate.log.error("Could not load Gate " + file.getName() + " - Unknown symbol '" + symbol + "' in diagram");
+                            Stargate.log.error("Could not load Gate " + file.getFileName() + " - Unknown symbol '" + symbol + "' in diagram");
                             return null;
                         }
                         row.add(symbol);
@@ -374,7 +380,7 @@ public class Gate {
                 }
             }
         } catch (Exception ex) {
-            Stargate.log.error("Could not load Gate " + file.getName() + " - Invalid block ID given");
+            Stargate.log.error("Could not load Gate " + file.getFileName() + " - Invalid block ID given");
             return null;
         } finally {
             if (scanner != null) scanner.close();
@@ -397,28 +403,28 @@ public class Gate {
             layout[y] = result;
         }
 
-        Gate gate = new Gate(file.getName(), layout, types);
+        Gate gate = new Gate(file, layout, types);
 
         gate.portalBlockOpen = readConfigBlock(config, gate, file, "portal-open", gate.portalBlockOpen);
         gate.portalBlockClosed = readConfigBlock(config, gate, file, "portal-closed", gate.portalBlockClosed);
         gate.useCost = readConfigNum(config, gate, file, "usecost", null);
         gate.destroyCost = readConfigNum(config, gate, file, "destroycost", null);
         gate.createCost = readConfigNum(config, gate, file, "createcost", null);
-        gate.toOwner = (config.containsKey("toowner") ? Boolean.valueOf(config.get("toowner")) : iConomyHandler.toOwner);
+        gate.toOwner = (config.containsKey("toowner") ? Boolean.valueOf(config.get("toowner")) : Stargate.config.economy.toOwner);
 
         if (gate.getControls().length != 2) {
-            Stargate.log.error("Could not load Gate " + file.getName() + " - Gates must have exactly 2 control points.");
+            Stargate.log.error("Could not load Gate " + file.getFileName() + " - Gates must have exactly 2 control points.");
             return null;
         }
         
         // Merge frame types, add open mat to list
         frameBlocks.addAll(frameTypes);
         
-        gate.save(file.getParent() + "/"); // Updates format for version changes
+        gate.save(file.getParent()); // Updates format for version changes
         return gate;
     }
 
-    private static BigDecimal readConfigNum(HashMap<String, String> config, Gate gate, File file, String key, BigDecimal def) {
+    private static BigDecimal readConfigNum(HashMap<String, String> config, Gate gate, Path file, String key, BigDecimal def) {
         if (config.containsKey(key)) {
             try {
                 return new BigDecimal(config.get(key));
@@ -429,7 +435,7 @@ public class Gate {
         return def;
     }
     
-    private static BlockState readConfigBlock(HashMap<String, String> config, Gate gate, File file, String key, BlockState def) {
+    private static BlockState readConfigBlock(HashMap<String, String> config, Gate gate, Path file, String key, BlockState def) {
         if (config.containsKey(key)) {
             Optional<BlockState> state = Sponge.getRegistry().getType(BlockState.class, config.get(key));
             if (state.isPresent()) {
@@ -441,28 +447,28 @@ public class Gate {
         return def;
     }
 
-    public static void loadGates(String gateFolder) {
-        File dir = new File(gateFolder);
-        File[] files;
-
-        if (dir.exists()) {
-            files = dir.listFiles(new StargateFilenameFilter());
-        } else {
-            files = new File[0];
+    public static void loadGates(Path gateFolder) throws IOException {
+        List<Path> files = new LinkedList<>();
+        if (Files.exists(gateFolder)) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(gateFolder, path -> path.getFileName().toString().endsWith(".gate"))) {
+                for (Path path : stream) {
+                    files.add(path);
+                }
+            }
         }
 
-        if (files.length == 0) {
-            dir.mkdir();
+        if (files.size() == 0) {
+            Files.createDirectories(gateFolder);
             populateDefaults(gateFolder);
         } else {
-            for (File file : files) {
+            for (Path file : files) {
                 Gate gate = loadGate(file);
                 if (gate != null) registerGate(gate);
             }
         }
     }
     
-    public static void populateDefaults(String gateFolder) {
+    public static void populateDefaults(Path gateFolder) throws IOException {
         BlockState Obsidian = BlockTypes.OBSIDIAN.getDefaultState();
         char[][] layout = {
             {' ', 'X','X', ' '},
@@ -475,7 +481,7 @@ public class Gate {
         types.put('X', Obsidian);
         types.put('-', Obsidian);
 
-        Gate gate = new Gate("nethergate.gate", layout, types);
+        Gate gate = new Gate(Paths.get("nethergate.gate"), layout, types);
         gate.save(gateFolder);
         registerGate(gate);
     }
@@ -503,13 +509,6 @@ public class Gate {
     
     public static boolean isGateBlock(BlockState type) {
         return frameBlocks.contains(type);
-    }
-    
-    static class StargateFilenameFilter implements FilenameFilter {
-        @Override
-        public boolean accept(File dir, String name) {
-            return name.endsWith(".gate");
-        }
     }
     
     public static void clearGates() {

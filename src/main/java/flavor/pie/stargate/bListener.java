@@ -67,7 +67,7 @@ public class bListener {
         Location<World> block = event.getTransactions().get(0).getOriginal().getLocation().get();
 
         Portal portal = Portal.getByBlock(block);
-        if (portal == null && Stargate.protectEntrance)
+        if (portal == null)
             portal = Portal.getByEntrance(block);
         if (portal == null) return;
         if ((portal.getButton() != null && block.getBlockPosition().equals(portal.getButton().getBlock().getBlockPosition()))

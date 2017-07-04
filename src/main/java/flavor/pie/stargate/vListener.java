@@ -36,7 +36,6 @@ import java.util.UUID;
 public class vListener {
     @Listener
     public void onVehicleMove(MoveEntityEvent event) {
-        if (!Stargate.handleVehicles) return;
         Entity passenger = event.getTargetEntity().getPassengers().stream().findFirst().orElse(null);
         Entity vehicle = event.getTargetEntity();
         if (vehicle.getType().equals(EntityTypes.PLAYER)) return;

@@ -26,6 +26,9 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import flavor.pie.stargate.event.StargateAccessEvent;
 import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 
 import org.bstats.MetricsLite;
@@ -37,6 +40,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
@@ -61,6 +65,10 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -75,34 +83,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Plugin(id = "stargate", name = "Stargate", version = "0.1.1", authors = {"pie_flavor", "Dinnerbone", "Drakia"}, description = "The classic portal plugin, ported to Sponge.")
 public class Stargate {
     public static Logger log;
-    private ConfigurationNode newConfig;
     public static Stargate stargate;
     public static PluginContainer stargateContainer;
     private static LangLoader lang;
     
-    private static String portalFolder;
-    private static String gateFolder;
-    private static String langFolder;
-    private static String defNetwork = "central";
-    public static boolean destroyExplosion = false;
-    public static int maxGates = 0;
-    private static String langName = "en";
+    private static Path portalFolder;
+    private static Path gateFolder;
+    private static Path langFolder;
     private static int activeTime = 10;
     private static int openTime = 10;
-    public static boolean destMemory = false;
-    public static boolean handleVehicles = true;
-    public static boolean sortLists = false;
-    public static boolean protectEntrance = false;
-    public static boolean enableBungee = true;
-    public static TextColor signColor;
+    public static boolean enableBungee = false;
     public static ChannelBinding.RawDataChannel channel;
-    
-    // Temp workaround for snowmen, don't check gate entrance
-    public static boolean ignoreEntrance = false;
-    
-    // Used for debug
-    public static boolean debug = false;
-    public static boolean permDebug = false;
     
     public static ConcurrentLinkedQueue<Portal> openList = new ConcurrentLinkedQueue<>();
     public static ConcurrentLinkedQueue<Portal> activeList = new ConcurrentLinkedQueue<>();
@@ -116,15 +107,19 @@ public class Stargate {
     @Inject
     Logger logger;
     @Inject @ConfigDir(sharedRoot = false)
-    File dir;
+    Path dir;
+    @Inject @DefaultConfig(sharedRoot = false)
+    Path configFile;
+    @Inject @DefaultConfig(sharedRoot = false)
+    ConfigurationLoader<CommentedConfigurationNode> loader;
     @Inject
     PluginContainer container;
-    File configFile;
-    YAMLConfigurationLoader loader;
     @Inject
     MetricsLite metrics;
 
-    private File getDataFolder() {
+    public static Config config;
+
+    private Path getDataFolder() {
         return dir;
     }
 
@@ -135,25 +130,21 @@ public class Stargate {
     }
 
     @Listener
-    public void onEnable(GameStartedServerEvent e) throws IOException {
+    public void onEnable(GameStartedServerEvent e) throws IOException, ObjectMappingException {
         stargateContainer = container;
-        if (!dir.exists()) {
-            dir.mkdirs();
+
+        if (!loader.getDefaultOptions().acceptsType(BigDecimal.class)) {
+            loader.getDefaultOptions().getSerializers().registerType(TypeToken.of(BigDecimal.class), new Config.BigDecimalSerializer());
         }
-        configFile = new File(dir, "config.yml");
-        if (!configFile.exists()) {
-            Sponge.getAssetManager().getAsset(this, "config.yml").get().copyToFile(configFile.toPath());
-        }
+        
         log = logger;
-        loader = YAMLConfigurationLoader.builder().setFlowStyle(DumperOptions.FlowStyle.BLOCK).setFile(configFile).build();
-        newConfig = loader.load(loader.getDefaultOptions().setShouldCopyDefaults(true));
         Stargate.stargate = this;
         
-        // Set portalFile and gateFolder to the plugin folder as defaults.
-        portalFolder = getDataFolder().getPath().replaceAll("\\\\", "/") + "/portals/";
-        gateFolder = getDataFolder().getPath().replaceAll("\\\\", "/") + "/gates/";
-        langFolder = getDataFolder().getPath().replaceAll("\\\\", "/") + "/lang/";
-        
+        //Set the various folders
+        portalFolder = dir.resolve(Paths.get("portals"));
+        gateFolder = dir.resolve(Paths.get("gates"));
+        langFolder = dir.resolve(Paths.get("lang"));
+
         // Register events before loading gates to stop weird things happening.
         Sponge.getEventManager().registerListeners(this, new pListener());
         Sponge.getEventManager().registerListeners(this, new bListener());
@@ -172,7 +163,7 @@ public class Stargate {
         }
         
         // It is important to load languages here, as they are used during reloadGates()
-        lang = new LangLoader(langFolder, Stargate.langName);
+        lang = new LangLoader(langFolder, Stargate.config.lang);
         
         this.migrate();
         this.reloadGates();
@@ -181,57 +172,24 @@ public class Stargate {
         Task.builder().execute(new BlockPopulatorThread()).intervalTicks(1).submit(this);
     }
 
-    public void loadConfig() {
-        reloadConfig();
-        
-        // Load values into variables
-        portalFolder = newConfig.getNode("portal-folder").getString();
-        gateFolder = newConfig.getNode("gate-folder").getString();
-        defNetwork = newConfig.getNode("default-gate-network").getString().trim();
-        destroyExplosion = newConfig.getNode("destroyexplosion").getBoolean();
-        maxGates = newConfig.getNode("maxgates").getInt();
-        langName = newConfig.getNode("lang").getString();
-        destMemory = newConfig.getNode("destMemory").getBoolean();
-        ignoreEntrance = newConfig.getNode("ignoreEntrance").getBoolean();
-        handleVehicles = newConfig.getNode("handleVehicles").getBoolean();
-        sortLists = newConfig.getNode("sortLists").getBoolean();
-        protectEntrance = newConfig.getNode("protectEntrance").getBoolean();
-        enableBungee = newConfig.getNode("enableBungee").getBoolean();
-        // Sign color
-        String sc = newConfig.getString("signColor");
+    private void loadConfig() {
         try {
-            signColor = newConfig.getNode("signColor").getValue(TypeToken.of(TextColor.class));
-        } catch (Exception ignore) {
-            log.warn("You have specified an invalid color in your config.yml. Defaulting to BLACK");
-            signColor = TextColors.BLACK;
-        }
-        // Debug
-        debug = newConfig.getNode("debug").getBoolean();
-        permDebug = newConfig.getNode("permdebug").getBoolean();
-        // iConomy
-        iConomyHandler.useiConomy = newConfig.getNode("useiconomy").getBoolean();
-        iConomyHandler.createCost = new BigDecimal(newConfig.getNode("createcost").getString());
-        iConomyHandler.destroyCost = new BigDecimal(newConfig.getNode("destroycost").getString());
-        iConomyHandler.useCost = new BigDecimal(newConfig.getNode("usecost").getString());
-        iConomyHandler.toOwner = newConfig.getNode("toowner").getBoolean();
-        iConomyHandler.chargeFreeDestination = newConfig.getNode("chargefreedestination").getBoolean();
-        iConomyHandler.freeGatesGreen = newConfig.getNode("freegatesgreen").getBoolean();
-
-        this.saveConfig();
-    }
-
-    private void saveConfig() {
-        try {
-            loader.save(newConfig);
-        } catch (IOException ex) {
-            rethrow(ex);
-        }
-    }
-
-    private void reloadConfig() {
-        try {
-            newConfig = loader.load();
-        } catch (IOException ex) {
+            boolean convert = false;
+            if (!Files.exists(configFile)) {
+                Path oldConfig = dir.resolve(Paths.get("config.yml"));
+                if (Files.exists(oldConfig)) {
+                    convert = true;
+                    YAMLConfigurationLoader loader = YAMLConfigurationLoader.builder().setPath(oldConfig).build();
+                    Config.Old old = loader.load().getValue(Config.Old.type);
+                    config = old.convert();
+                    this.loader.save(this.loader.createEmptyNode().setValue(Config.type, config));
+                }
+                Sponge.getAssetManager().getAsset(this, "default.conf").get().copyToFile(configFile);
+            }
+            if (!convert) {
+                config = loader.load().getValue(Config.type);
+            }
+        } catch (Exception ex) {
             rethrow(ex);
         }
     }
@@ -241,7 +199,7 @@ public class Stargate {
         throw (T) t;
     }
 
-    public void reloadGates() {
+    public void reloadGates() throws IOException {
         // Close all gates prior to reloading
         for (Portal p : openList) {
             p.close(true);
@@ -254,37 +212,27 @@ public class Stargate {
         }
     }
     
-    private void migrate() {
+    private void migrate() throws IOException {
         // Only migrate if new file doesn't exist.
-        File newPortalDir = new File(portalFolder);
-        if (!newPortalDir.exists()) {
-            newPortalDir.mkdirs();
+        if (!Files.exists(portalFolder)) {
+            Files.createDirectories(portalFolder);
         }
-        File newFile = new File(portalFolder, Sponge.getServer().getDefaultWorld().get().getWorldName() + ".db");
-        if (!newFile.exists()) {
-            newFile.getParentFile().mkdirs();
+        Path newFile = portalFolder.resolve(Paths.get(Sponge.getServer().getDefaultWorld().get().getWorldName() + ".db"));
+        if (!Files.exists(newFile)) {
+            Files.createDirectories(dir.getParent());
             // Migrate not-so-old stargate db
-            File oldishFile = new File("plugins/Stargate/stargate.db");
-            if (oldishFile.exists()) {
+            Path oldishFile = dir.resolve(Paths.get("stargate.db"));
+            if (Files.exists(oldishFile)) {
                 Stargate.log.info("Migrating existing stargate.db");
-                oldishFile.renameTo(newFile);
+                Files.move(oldishFile, newFile);
             }
         }
         
-        // Migrate old gates if applicaple
-        File oldDir = new File("stargates");
-        if (oldDir.exists()) {
-            File newDir = new File(gateFolder);
-            if (!newDir.exists()) newDir.mkdirs();
-            for (File file : oldDir.listFiles(new Gate.StargateFilenameFilter())) {
-                Stargate.log.info("Migrating existing gate " + file.getName());
-                file.renameTo(new File(gateFolder, file.getName()));
-            }
-        }
+        // Can't migrate old gates because of blockstates
     }
     
     public static void debug(String rout, String msg) {
-        if (Stargate.debug) {
+        if (Stargate.config.debug) {
             log.info("[SG::" + rout + "] " + msg);
         }
     }
@@ -303,23 +251,23 @@ public class Stargate {
     }
     
     public static void setLine(Sign sign, int index, String text) {
-        sign.offer(sign.lines().set(index, Text.builder(text).color(Stargate.signColor).build()));
+        sign.offer(sign.lines().set(index, Text.builder(text).color(Stargate.config.portal.signColor).build()));
     }
 
     public static void setLine(Sign sign, int index, Text text) {
-        sign.offer(sign.lines().set(index, Text.builder().append(text).color(Stargate.signColor).build()));
+        sign.offer(sign.lines().set(index, Text.builder().append(text).color(Stargate.config.portal.signColor).build()));
     }
 
-    public static String getSaveLocation() {
+    public static Path getSaveLocation() {
         return portalFolder;
     }
     
-    public static String getGateFolder() {
+    public static Path getGateFolder() {
         return gateFolder;
     }
 
     public static String getDefaultNetwork() {
-        return defNetwork;
+        return config.portal.defaultGateNetwork;
     }
     
     public static String getString(String name) {
@@ -379,8 +327,7 @@ public class Stargate {
      * Check whether the player has the given permissions.
      */
     public static boolean hasPerm(Player player, String perm) {
-        if (permDebug)
-            Stargate.debug("hasPerm::SuperPerm(" + player.getName() + ")", perm + " => " + player.hasPermission(perm));
+        Stargate.debug("hasPerm::Permission(" + player.getName() + ")", perm + " => " + player.hasPermission(perm));
         return player.hasPermission(perm);
     }
     
@@ -392,12 +339,10 @@ public class Stargate {
      */
     public static boolean hasPermDeep(Player player, String perm) {
         if (player.getPermissionValue(SubjectData.GLOBAL_CONTEXT, perm).equals(Tristate.UNDEFINED)) {
-            if (permDebug)
-                Stargate.debug("hasPermDeep::SuperPerm", perm + " => true");
+            Stargate.debug("hasPermDeep::Permission(" + player.getName() + ")", perm + " => true");
             return true;
         }
-        if (permDebug)
-            Stargate.debug("hasPermDeep::SuperPerms", perm + " => " + player.hasPermission(perm));
+        Stargate.debug("hasPermDeep::Permission(" + player.getName() + ")", perm + " => " + player.hasPermission(perm));
         return player.hasPermission(perm);
     }
     
@@ -469,7 +414,7 @@ public class Stargate {
         // Player gets free use
         if (hasPerm(player, "stargate.free") || Stargate.hasPerm(player,  "stargate.free.use")) return true;
         // Don't charge for free destination gates
-        if (dest != null && !iConomyHandler.chargeFreeDestination && dest.isFree()) return true;
+        if (dest != null && !config.economy.freeDestination && dest.isFree()) return true;
         return false;
     }
     
@@ -608,7 +553,7 @@ public class Stargate {
         // Portal is free
         if (src.isFree()) return BigDecimal.ZERO;
         // Not charging for free destinations
-        if (dest != null && !iConomyHandler.chargeFreeDestination && dest.isFree()) return BigDecimal.ZERO;
+        if (dest != null && !config.economy.freeDestination && dest.isFree()) return BigDecimal.ZERO;
         // Cost is 0 if the player owns this gate and funds go to the owner
         if (src.getGate().getToOwner() && src.getOwner().equals(player.getUniqueId())) return BigDecimal.ZERO;
         // Player gets free gate use
@@ -731,8 +676,12 @@ public class Stargate {
                 boolean oldEnableBungee = enableBungee;
                 // Reload data
                 loadConfig();
-                reloadGates();
-                lang.setLang(langName);
+                try {
+                    reloadGates();
+                } catch (IOException ex) {
+                    throw new CommandException(Text.of("Could not reload gates!"), ex);
+                }
+                lang.setLang(config.lang);
                 lang.reload();
 
                 // Enable the required channels for Bungee support

@@ -33,7 +33,7 @@ public class eListener {
         for (Location<World> b : event.getAffectedLocations()) {
             Portal portal = Portal.getByBlock(b);
             if (portal == null) continue;
-            if (Stargate.destroyExplosion) {
+            if (Stargate.config.portal.destroyExplosion) {
                 portal.unregister(true, true);
             } else {
                 Stargate.blockPopulatorQueue.add(new BloxPopulator(new Blox(b), b.getBlock()));

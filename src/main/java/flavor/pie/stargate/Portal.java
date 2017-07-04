@@ -54,6 +54,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -643,10 +646,10 @@ public class Portal {
         activePlayer = player;
         String network = getNetwork();
         destinations = getDestinations(player, network);
-        if (Stargate.sortLists) {
+        if (Stargate.config.portal.sortLists) {
             Collections.sort(destinations);
         }
-        if (Stargate.destMemory && !lastDest.isEmpty() && destinations.contains(lastDest)) {
+        if (Stargate.config.portal.destMemory && !lastDest.isEmpty() && destinations.contains(lastDest)) {
             destination = lastDest;
         }
         
@@ -704,7 +707,7 @@ public class Portal {
             return;
         }
 
-        if (!Stargate.destMemory || !activate || lastDest.isEmpty()) {
+        if (!Stargate.config.portal.destMemory || !activate || lastDest.isEmpty()) {
             int index = destinations.indexOf(destination);
             index += dir;
             if (index >= destinations.size()) 
@@ -762,7 +765,7 @@ public class Portal {
             } else {
                 int index = destinations.indexOf(destination);
                 if ((index == max) && (max > 1) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && iConomyHandler.freeGatesGreen) {
+                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index - 2), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index - 2)));
@@ -771,7 +774,7 @@ public class Portal {
                     }
                 }
                 if ((index > 0) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && iConomyHandler.freeGatesGreen) {
+                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index - 1), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index - 1)));
@@ -780,7 +783,7 @@ public class Portal {
                     }
                 }
                 if (++done <= 3) {
-                    if (iConomyHandler.useiConomy() && iConomyHandler.freeGatesGreen) {
+                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destination, network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), ">" + destination + "<"));
@@ -789,7 +792,7 @@ public class Portal {
                     }
                 }
                 if ((max >= index + 1) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && iConomyHandler.freeGatesGreen) {
+                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index + 1), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index + 1)));
@@ -798,7 +801,7 @@ public class Portal {
                     }
                 }
                 if ((max >= index + 2) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && iConomyHandler.freeGatesGreen) {
+                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index + 2), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index + 2)));
@@ -1082,7 +1085,7 @@ public class Portal {
         }
         
         // Check if the player can create this gate layout
-        String gateName = gate.getFilename();
+        String gateName = gate.getFilename().toString();
         gateName = gateName.substring(0, gateName.indexOf('.'));
         if (!deny && !Stargate.canCreateGate(player, gateName)) {
             Stargate.debug("createPortal", "Player does not have access to gate layout");
@@ -1154,7 +1157,7 @@ public class Portal {
             
             // Check if there are too many gates in this network
             ArrayList<String> netList = allPortalsNet.get(portal.getNetwork().toLowerCase());
-            if (Stargate.maxGates > 0 && netList != null && netList.size() >= Stargate.maxGates) {
+            if (Stargate.config.portal.maxGates > 0 && netList != null && netList.size() >= Stargate.config.portal.maxGates) {
                 Stargate.sendMessage(player, Stargate.getString("createFull"));
                 return null;
             }
@@ -1313,14 +1316,14 @@ public class Portal {
     }
 
     public static void loadAllGates(World world) {
-        String location = Stargate.getSaveLocation();
+        Path location = Stargate.getSaveLocation();
         
-        File db = new File(location, world.getUniqueId() + ".db");
-        if (!db.exists()) {
-            db = new File(location, world.getName() + ".db");
+        Path db = location.resolve(Paths.get(world.getUniqueId() + ".db"));
+        if (!Files.exists(db)) {
+            db = location.resolve(Paths.get(world.getName() + ".db"));
         }
         
-        if (db.exists()) {
+        if (Files.exists(db)) {
             int l = 0;
             int portalCount = 0;
             try {
@@ -1430,7 +1433,7 @@ public class Portal {
                 }
                 Stargate.log.info("{" + world.getName() + "} Loaded " + portalCount + " stargates with " + OpenCount + " set as always-on");
             } catch (Exception e) {
-                Stargate.log.error("Exception while reading stargates from " + db.getName() + ": " + l);
+                Stargate.log.error("Exception while reading stargates from " + db.getFileName() + ": " + l);
                 e.printStackTrace();
             }
         } else {

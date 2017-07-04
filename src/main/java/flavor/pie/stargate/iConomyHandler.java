@@ -32,14 +32,6 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class iConomyHandler {
-    public static boolean useiConomy = false;
-    
-    public static BigDecimal useCost = BigDecimal.ZERO;
-    public static BigDecimal createCost = BigDecimal.ZERO;
-    public static BigDecimal destroyCost = BigDecimal.ZERO;
-    public static boolean toOwner = false;
-    public static boolean chargeFreeDestination = true;
-    public static boolean freeGatesGreen = false;
     
     public static EconomyService economy() {
         return Sponge.getServiceManager().provide(EconomyService.class).orElse(null);
@@ -51,7 +43,7 @@ public class iConomyHandler {
     
     public static BigDecimal getBalance(String player) {
         EconomyService economy = economy();
-        if (!useiConomy) return BigDecimal.ZERO;
+        if (!Stargate.config.economy.enable) return BigDecimal.ZERO;
         if (economy != null) {
             return economy.getOrCreateAccount(Sponge.getServer().getPlayer(player).get().getUniqueId()).get().getBalance(economy.getDefaultCurrency());
         }
@@ -60,7 +52,7 @@ public class iConomyHandler {
     
     public static boolean chargePlayer(String player, String target, BigDecimal amount) {
         EconomyService economy = economy();
-        if (!useiConomy) return true;
+        if (!Stargate.config.economy.enable) return true;
         if (economy != null) {
             UniqueAccount acct = getAccount(player);
             if (player.equals(target)) return true;
@@ -91,7 +83,7 @@ public class iConomyHandler {
     }
     
     public static boolean useiConomy() {
-        if (!useiConomy) return false;
+        if (!Stargate.config.economy.enable) return false;
         if (economy() != null) return true;
         return false;
     }
