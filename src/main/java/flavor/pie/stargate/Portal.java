@@ -51,8 +51,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -1242,14 +1240,13 @@ public class Portal {
     }
 
     public static void saveAllGates(World world) {
-        String loc = Stargate.getSaveLocation() + "/" + world.getName() + ".db";
+        Path loc = Stargate.getSaveLocation().resolve(Paths.get(world.getUniqueId() + ".db"));
 
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(loc, false));
+        try (BufferedWriter bw = Files.newBufferedWriter(loc)) {
 
             for (Portal portal : allPortals) {
-                String wName = portal.world.getName();
-                if (!wName.equalsIgnoreCase(world.getName())) continue;
+                UUID worldId = portal.world.getUniqueId();
+                if (!worldId.equals(world.getUniqueId())) continue;
                 StringBuilder builder = new StringBuilder();
                 Blox sign = new Blox(portal.id.getBlock());
                 Blox button = portal.button;
@@ -1299,8 +1296,6 @@ public class Portal {
                 bw.append(builder.toString());
                 bw.newLine();
             }
-
-            bw.close();
         } catch (Exception e) {
             Stargate.log.error("Exception while writing stargates to " + loc + ": " + e);
         }
