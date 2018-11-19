@@ -34,5 +34,4 @@ signArchives.dependsOn shadowJar
 shadowJar {
     configurations = [project.configurations.shadow]
     classifier = null
-    relocate('org.bstats', 'flavor.pie.stargate')
 }
