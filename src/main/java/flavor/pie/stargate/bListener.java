@@ -32,9 +32,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.scheduler.Task;
@@ -63,7 +61,7 @@ public class bListener {
 
     // Switch to LAST order so as to come after block protection plugins (Hopefully)
     @Listener(order = Order.LAST)
-    public void onBlockBreak(ChangeBlockEvent.Break event, @Named(NamedCause.SOURCE) Player player) {
+    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
         Location<World> block = event.getTransactions().get(0).getOriginal().getLocation().get();
 
         Portal portal = Portal.getByBlock(block);
@@ -125,7 +123,7 @@ public class bListener {
     @Listener
     @Include({ChangeBlockEvent.Decay.class, ChangeBlockEvent.Modify.class, ChangeBlockEvent.Break.class})
     public void onBlockPhysics(ChangeBlockEvent event) {
-        if (event.getCause().get(NamedCause.SOURCE, Player.class).isPresent()) return;
+        if (!(event.getCause().root() instanceof Player)) return;
         if (event.getCause().contains(Stargate.stargateContainer)) return;
         for (Transaction<BlockSnapshot> trans : event.getTransactions()) {
             if (!trans.getOriginal().getLocation().isPresent()) return;
@@ -148,7 +146,7 @@ public class bListener {
     }
 
     @Listener
-    public void onBlockFromTo(ChangeBlockEvent.Place event, @Named(NamedCause.SOURCE) LocatableBlock block) {
+    public void onBlockFromTo(ChangeBlockEvent.Place event, @First LocatableBlock block) {
         Portal portal = Portal.getByEntrance(block.getLocation());
 
         if (portal != null) {
@@ -161,7 +159,7 @@ public class bListener {
     }
 
     @Listener
-    public void onPistonExtend(ChangeBlockEvent.Pre event, @Named(NamedCause.SOURCE) LocatableBlock block) {
+    public void onPistonExtend(ChangeBlockEvent.Pre event, @First LocatableBlock block) {
         // mod compatibility?
 //            if (!block.getBlockState().get(Keys.PISTON_TYPE).isPresent()) return;
         for (Location<World> loc : event.getLocations()) {

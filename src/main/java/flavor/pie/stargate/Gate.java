@@ -150,7 +150,7 @@ public class Gate {
 
             for (int y = 0; y < layout.length; y++) {
                 for (int x = 0; x < layout[y].length; x++) {
-                    Character symbol = layout[y][x];
+                    char symbol = layout[y][x];
                     bw.append(symbol);
                 }
                 bw.newLine();
@@ -327,15 +327,13 @@ public class Gate {
     }
 
     public static Gate loadGate(Path file) throws IOException {
-        Scanner scanner = null;
         boolean designing = false;
         ArrayList<ArrayList<Character>> design = new ArrayList<>();
         HashMap<Character, BlockState> types = new HashMap<>();
         HashMap<String, String> config = new HashMap<>();
         HashSet<BlockState> frameTypes = new HashSet<>();
         int cols = 0;
-        try {
-            scanner = new Scanner(file);
+        try (Scanner scanner = new Scanner(file)) {
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
@@ -348,8 +346,10 @@ public class Gate {
                     }
 
                     for (char symbol : line.toCharArray()) {
-                        if (symbol != '.' && symbol != ' ' && symbol != '*' && ((symbol == '?') || (!types.containsKey(symbol)))) {
-                            Stargate.log.error("Could not load Gate " + file.getFileName() + " - Unknown symbol '" + symbol + "' in diagram");
+                        if (symbol != '.' && symbol != ' ' && symbol != '*' && ((symbol == '?') || (!types.containsKey(
+                                symbol)))) {
+                            Stargate.log.error(
+                                    "Could not load Gate " + file.getFileName() + " - Unknown symbol '" + symbol + "' in diagram");
                             return null;
                         }
                         row.add(symbol);
@@ -379,8 +379,6 @@ public class Gate {
         } catch (Exception ex) {
             Stargate.log.error("Could not load Gate " + file.getFileName() + " - Invalid block ID given");
             return null;
-        } finally {
-            if (scanner != null) scanner.close();
         }
 
         char[][] layout = new char[design.size()][cols];

@@ -19,16 +19,14 @@
 
 package flavor.pie.stargate.event;
 
-import flavor.pie.stargate.Stargate;
-
 import flavor.pie.stargate.Portal;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.Sponge;
 
 public class StargateCloseEvent extends StargateEvent {
     private boolean force;
 
     public StargateCloseEvent(Portal portal, boolean force) {
-        super("StargateCloseEvent", portal, Cause.source(Stargate.stargateContainer).build());
+        super("StargateCloseEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
         
         this.force = force;
     }

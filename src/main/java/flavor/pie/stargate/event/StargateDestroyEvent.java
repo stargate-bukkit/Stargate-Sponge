@@ -20,9 +20,8 @@
 package flavor.pie.stargate.event;
 
 import flavor.pie.stargate.Portal;
-import flavor.pie.stargate.Stargate;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 
 import java.math.BigDecimal;
 
@@ -30,9 +29,10 @@ public class StargateDestroyEvent extends StargateEvent {
     private boolean deny;
     private String denyReason;
     private BigDecimal cost;
+    private Player player;
     
     public StargateDestroyEvent(Portal portal, Player player, boolean deny, String denyMsg, BigDecimal cost) {
-        super("StargateDestroyEvent", portal, Cause.source(player).named("Stargate", Stargate.stargateContainer).build());
+        super("StargateDestroyEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
         this.deny = deny;
         this.denyReason = denyMsg;
         this.cost = cost;
@@ -60,6 +60,10 @@ public class StargateDestroyEvent extends StargateEvent {
     
     public void setCost(BigDecimal cost) {
         this.cost = cost;
+    }
+
+    public Player getPlayer() {
+        return this.player;
     }
 
 }

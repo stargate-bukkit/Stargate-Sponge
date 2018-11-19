@@ -25,13 +25,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import flavor.pie.stargate.event.StargateAccessEvent;
-import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
-
-import org.bstats.MetricsLite;
+import org.bstats.sponge.MetricsLite2;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
@@ -43,7 +41,6 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.network.ChannelBinding;
@@ -52,20 +49,15 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.BlockChangeFlag;
+import org.spongepowered.api.world.BlockChangeFlags;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.yaml.snakeyaml.DumperOptions;
 
-import javax.annotation.Nullable;
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,6 +70,8 @@ import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import javax.annotation.Nullable;
 
 @SuppressWarnings("unused")
 @Plugin(id = "stargate", name = "Stargate", version = "0.1.1", authors = {"pie_flavor", "Dinnerbone", "Drakia"}, description = "The classic portal plugin, ported to Sponge.")
@@ -115,7 +109,7 @@ public class Stargate {
     @Inject
     PluginContainer container;
     @Inject
-    MetricsLite metrics;
+    MetricsLite2 metrics;
 
     public static Config config;
 
@@ -604,8 +598,7 @@ public class Stargate {
             while (System.nanoTime() - sTime < 50000000) {
                 BloxPopulator b = Stargate.blockPopulatorQueue.poll();
                 if (b == null) return;
-                b.getBlox().getBlock().setBlock(b.getMat(), BlockChangeFlag.NONE,
-                        Cause.source(Stargate.stargateContainer).build());
+                b.getBlox().getBlock().setBlock(b.getMat(), BlockChangeFlags.NONE);
             }
         }
     }

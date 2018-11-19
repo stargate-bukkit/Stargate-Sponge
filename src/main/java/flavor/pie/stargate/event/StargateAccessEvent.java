@@ -20,17 +20,15 @@
 package flavor.pie.stargate.event;
 
 import flavor.pie.stargate.Portal;
-import flavor.pie.stargate.Stargate;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 
 public class StargateAccessEvent extends StargateEvent {
     private Player player;
     private boolean deny;
-    
+
     public StargateAccessEvent(Player player, Portal portal, boolean deny) {
-        super("StargateAccessEvent", portal, Cause.source(player).named("Stargate", Stargate.stargateContainer).build());
-        
+        super("StargateAccessEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
         this.player = player;
         this.deny = deny;
     }

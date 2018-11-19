@@ -689,7 +689,7 @@ public class Portal {
     }
     
     public void cycleDestination(Player player, int dir) {
-        Boolean activate = false;
+        boolean activate = false;
         if (!isActive() || getActivePlayer() != player) {
             // If the event is cancelled, return
             if (!activate(player)) {

@@ -20,15 +20,20 @@
 package flavor.pie.stargate.event;
 
 import flavor.pie.stargate.Portal;
-import flavor.pie.stargate.Stargate;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 public class StargateOpenEvent extends StargateEvent {
     private boolean force;
+    @Nullable
+    private Player player;
 
-    public StargateOpenEvent(Player player, Portal portal, boolean force) {
-        super ("StargateOpenEvent", portal, player == null ? Cause.source(Stargate.stargateContainer).build() : Cause.source(player).named("Stargate", Stargate.stargateContainer).build());
+    public StargateOpenEvent(@Nullable Player player, Portal portal, boolean force) {
+        super ("StargateOpenEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
         this.force = force;
     }
     
@@ -38,5 +43,9 @@ public class StargateOpenEvent extends StargateEvent {
     
     public void setForce(boolean force) {
         this.force = force;
+    }
+
+    public Optional<Player> getPlayer() {
+        return Optional.ofNullable(this.player);
     }
 }

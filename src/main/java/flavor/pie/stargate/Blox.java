@@ -28,7 +28,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -86,7 +85,7 @@ public class Blox {
     }
 
     public void setType(BlockType type) {
-        world.getLocation(x, y, z).setBlockType(type, Cause.source(Stargate.stargateContainer).build());
+        world.getLocation(x, y, z).setBlockType(type);
     }
 
     public BlockType getType() {
@@ -94,7 +93,7 @@ public class Blox {
     }
 
     public void setData(BlockState data) {
-        world.getLocation(x, y, z).setBlock(data, Cause.source(Stargate.stargateContainer).build());
+        world.getLocation(x, y, z).setBlock(data);
     }
 
     public BlockState getData() {

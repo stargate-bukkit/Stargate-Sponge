@@ -21,13 +21,13 @@ package flavor.pie.stargate;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -135,7 +135,7 @@ public class LangLoader {
 			
 			// Save file
 			fos = new FileOutputStream(datFolder.resolve(Paths.get(lang + ".txt")).toFile());
-			OutputStreamWriter out = new OutputStreamWriter(fos, "UTF8");
+			OutputStreamWriter out = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
 			BufferedWriter bw = new BufferedWriter(out);
 			
 			// Output normal Language data
@@ -155,7 +155,7 @@ public class LangLoader {
 			ex.printStackTrace();
 		} finally {
 			if (fos != null) {
-				try {fos.close();} catch (Exception ex) {}
+				try {fos.close();} catch (Exception ignored) {}
 			}
 		}
 		if (updated)
@@ -173,9 +173,9 @@ public class LangLoader {
 		try {
 			if (is == null) {
 				fis = new FileInputStream(datFolder.resolve(Paths.get(lang + ".txt")).toFile());
-				isr = new InputStreamReader(fis, "UTF8");
+				isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
 			} else {
-				isr = new InputStreamReader(is, "UTF8");
+				isr = new InputStreamReader(is, StandardCharsets.UTF_8);
 			}
 			BufferedReader br = new BufferedReader(isr);
 			String line = br.readLine();
@@ -200,7 +200,7 @@ public class LangLoader {
 		} finally {
 			if (fis != null) {
 				try {fis.close();}
-				catch (Exception ex) {}
+				catch (Exception ignored) {}
 			}
 		}
 		return strings;

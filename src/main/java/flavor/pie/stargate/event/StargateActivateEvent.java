@@ -19,19 +19,18 @@
 
 package flavor.pie.stargate.event;
 
-import java.util.ArrayList;
-
 import flavor.pie.stargate.Portal;
-import flavor.pie.stargate.Stargate;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+
+import java.util.ArrayList;
 
 public class StargateActivateEvent extends StargateEvent {
     private ArrayList<String> destinations;
     private String destination;
 
     public StargateActivateEvent(Portal portal, Player player, ArrayList<String> destinations, String destination) {
-        super("StargateActivateEvent", portal, Cause.source(player).named("Stargate", Stargate.stargateContainer).build());
+        super("StargateActivateEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
 
         this.destinations = destinations;
         this.destination = destination;

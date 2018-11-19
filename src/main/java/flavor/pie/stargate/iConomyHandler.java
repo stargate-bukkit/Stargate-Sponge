@@ -20,7 +20,6 @@
 package flavor.pie.stargate;
 
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
@@ -59,17 +58,17 @@ public class iConomyHandler {
             TransactionResult res;
             if (target == null) {
                 if (amount.compareTo(BigDecimal.ZERO) > 0) {
-                    res = acct.withdraw(economy.getDefaultCurrency(), amount, Cause.source(Stargate.stargateContainer).build());
+                    res = acct.withdraw(economy.getDefaultCurrency(), amount, Sponge.getCauseStackManager().getCurrentCause());
                 } else {
-                    res = acct.deposit(economy.getDefaultCurrency(), amount.negate(), Cause.source(Stargate.stargateContainer).build());
+                    res = acct.deposit(economy.getDefaultCurrency(), amount.negate(), Sponge.getCauseStackManager().getCurrentCause());
                 }
             } else {
                 if (amount.compareTo(BigDecimal.ZERO) > 0) {
                     res = acct.transfer(getAccount(target), economy.getDefaultCurrency(), amount,
-                            Cause.source(Stargate.stargateContainer).build());
+                            Sponge.getCauseStackManager().getCurrentCause());
                 } else {
                     res = getAccount(target).transfer(acct, economy.getDefaultCurrency(), amount.negate(),
-                            Cause.source(Stargate.stargateContainer).build());
+                            Sponge.getCauseStackManager().getCurrentCause());
                 }
             }
             return res.getResult().equals(ResultType.SUCCESS);

@@ -20,10 +20,9 @@
 package flavor.pie.stargate.event;
 
 import flavor.pie.stargate.Portal;
-
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent;
 import org.spongepowered.api.world.World;
 
@@ -33,7 +32,7 @@ public class StargatePortalEvent extends StargateEvent implements TargetPlayerEv
     private Transform<World> exit;
     
     public StargatePortalEvent(Player player, Portal portal, Portal dest, Transform<World> exit) {
-        super ("StargatePortalEvent", portal, Cause.source(player).build());
+        super ("StargatePortalEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
 
         this.player = player;
         this.destination = dest;

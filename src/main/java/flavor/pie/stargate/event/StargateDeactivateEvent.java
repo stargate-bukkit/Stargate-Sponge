@@ -20,12 +20,11 @@
 package flavor.pie.stargate.event;
 
 import flavor.pie.stargate.Portal;
-import flavor.pie.stargate.Stargate;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.Sponge;
 
 public class StargateDeactivateEvent extends StargateEvent {
     
     public StargateDeactivateEvent(Portal portal) {
-        super("StargatDeactivateEvent", portal, Cause.source(Stargate.stargateContainer).build());
+        super("StargatDeactivateEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
     }
 }
