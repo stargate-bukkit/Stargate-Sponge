@@ -22,23 +22,19 @@ package flavor.pie.stargate.event;
 import flavor.pie.stargate.Portal;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-
-import java.math.BigDecimal;
 import java.util.List;
 
 public class StargateCreateEvent extends StargateEvent {
     private boolean deny;
     private String denyReason;
     private List<String> lines;
-    private BigDecimal cost;
 
     
-    public StargateCreateEvent(Player player, Portal portal, List<String> lines, boolean deny, String denyReason, BigDecimal cost) {
+    public StargateCreateEvent(Player player, Portal portal, List<String> lines, boolean deny, String denyReason) {
         super("StargateCreateEvent", portal, Sponge.getCauseStackManager().getCurrentCause());
         this.lines = lines;
         this.deny = deny;
         this.denyReason = denyReason;
-        this.cost = cost;
     }
     
     public String getLine(int index) throws IndexOutOfBoundsException {
@@ -59,14 +55,6 @@ public class StargateCreateEvent extends StargateEvent {
     
     public void setDenyReason(String denyReason) {
         this.denyReason = denyReason;
-    }
-    
-    public BigDecimal getCost() {
-        return cost;
-    }
-    
-    public void setCost(BigDecimal cost) {
-        this.cost = cost;
     }
 
 }
