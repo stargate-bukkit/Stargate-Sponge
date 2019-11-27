@@ -16,14 +16,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+/*
 package flavor.pie.stargate;
 
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.economy.transaction.ResultType;
-import org.spongepowered.api.service.economy.transaction.TransactionResult;
+//import org.spongepowered.api.service.economy.transaction.ResultType;
+//import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 
@@ -41,16 +41,18 @@ public class iConomyHandler {
     }
     
     public static BigDecimal getBalance(String player) {
-        EconomyService economy = economy();
+    	return BigDecimal.ZERO;	//This seems to be happening when economy is disabled
+        /*EconomyService economy = economy();
         if (!Stargate.config.economy.enable) return BigDecimal.ZERO;
         if (economy != null) {
             return economy.getOrCreateAccount(Sponge.getServer().getPlayer(player).get().getUniqueId()).get().getBalance(economy.getDefaultCurrency());
         }
-        return BigDecimal.ZERO;
+        return BigDecimal.ZERO;*//*
     }
     
     public static boolean chargePlayer(String player, String target, BigDecimal amount) {
-        EconomyService economy = economy();
+    	return true;	//This seems to be happening when economy is disabled
+        /*EconomyService economy = economy();
         if (!Stargate.config.economy.enable) return true;
         if (economy != null) {
             UniqueAccount acct = getAccount(player);
@@ -73,7 +75,7 @@ public class iConomyHandler {
             }
             return res.getResult().equals(ResultType.SUCCESS);
         }
-        return true;
+        return true;*//*
     }
 
     public static boolean chargePlayer(String player, UUID target, BigDecimal amount) {
@@ -82,9 +84,10 @@ public class iConomyHandler {
     }
     
     public static boolean useiConomy() {
-        if (!Stargate.config.economy.enable) return false;
+    	return false;	//This seems to be happening when economy is disabled
+        /*if (!Stargate.config.economy.enable) return false;
         if (economy() != null) return true;
-        return false;
+        return false;*//*
     }
     
     public static Text format(BigDecimal amt) {
@@ -99,3 +102,4 @@ public class iConomyHandler {
         return Sponge.getServiceManager().isRegistered(EconomyService.class);
     }
 }
+*/

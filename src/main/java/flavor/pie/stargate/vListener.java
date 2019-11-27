@@ -21,17 +21,17 @@
 
 package flavor.pie.stargate;
 
-import org.spongepowered.api.Sponge;
+//import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.text.serializer.TextSerializers;
+//import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.UUID;
+//import java.math.BigDecimal;
+//import java.util.Optional;
+//import java.util.UUID;
 
 public class vListener {
     @Listener
@@ -70,28 +70,6 @@ public class vListener {
                 Stargate.sendMessage(player, Stargate.getString("denyMsg"));
                 portal.close(false);
                 return;
-            }
-
-            BigDecimal cost = Stargate.getUseCost(player, portal, dest);
-            if (cost.compareTo(BigDecimal.ZERO) > 0) {
-                UUID target = portal.getGate().getToOwner() ? portal.getOwner() : null;
-                if (!Stargate.chargePlayer(player, target, cost)) {
-                    // Insufficient Funds
-                    Stargate.sendMessage(player, Stargate.getString("inFunds"));
-                    portal.close(false);
-                    return;
-                }
-                String deductMsg = Stargate.getString("ecoDeduct");
-                deductMsg = Stargate.replaceVars(deductMsg, new String[] {"%cost%", "%portal%"}, new String[] {TextSerializers.FORMATTING_CODE.serialize(iConomyHandler.format(cost)), portal.getName()});
-                Stargate.sendMessage(player, deductMsg, false);
-                if (target != null) {
-                    Optional<Player> p = Sponge.getServer().getPlayer(target);
-                    if (p.isPresent()) {
-                        String obtainedMsg = Stargate.getString("ecoObtain");
-                        obtainedMsg = Stargate.replaceVars(obtainedMsg, new String[] {"%cost%", "%portal%"}, new String[] {TextSerializers.FORMATTING_CODE.serialize(iConomyHandler.format(cost)), portal.getName()});
-                        Stargate.sendMessage(p.get(), obtainedMsg, false);
-                    }
-                }
             }
 
             Stargate.sendMessage(player, Stargate.getString("teleportMsg"), false);

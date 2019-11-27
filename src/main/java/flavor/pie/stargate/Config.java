@@ -20,8 +20,8 @@ public class Config {
     public int version = 1;
     @Setting
     public PortalSection portal;
-    @Setting
-    public EconomySection economy;
+    //@Setting
+    //public EconomySection economy;
     @Setting
     public boolean debug = false;
     @Setting
@@ -45,6 +45,7 @@ public class Config {
         public boolean sortLists = false;
     }
 
+    /*
     @ConfigSerializable
     public static class EconomySection {
         @Setting
@@ -61,7 +62,7 @@ public class Config {
         public boolean freeDestination = true;
         @Setting("free-gates-green")
         public boolean freeGatesGreen = true;
-    }
+    }*/
 
     @ConfigSerializable
     public static class Old {
@@ -122,7 +123,7 @@ public class Config {
             pSection.signColor = signColor;
             pSection.sortLists = sortLists;
             config.portal = pSection;
-            EconomySection eSection = new EconomySection();
+            /*EconomySection eSection = new EconomySection();
             eSection.createCost = new BigDecimal(createCost);
             eSection.destroyCost = new BigDecimal(destroyCost);
             eSection.enable = useIconomy;
@@ -130,7 +131,7 @@ public class Config {
             eSection.freeGatesGreen = freeGatesGreen;
             eSection.toOwner = toOwner;
             eSection.useCost = new BigDecimal(useCost);
-            config.economy = eSection;
+            config.economy = eSection;*/
             return config;
         }
     }

@@ -43,8 +43,8 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
+//import org.spongepowered.api.text.format.TextColors;
+//import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -535,6 +535,10 @@ public class Portal {
             case EAST:
                 x = 1;
                 break;
+            // Just in case
+            default:
+            	x = 1;
+            	break;
         }
         final Vector3d newVelocity = new Vector3d(x, 0, z).mul(velocity);
 
@@ -763,49 +767,54 @@ public class Portal {
             } else {
                 int index = destinations.indexOf(destination);
                 if ((index == max) && (max > 1) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
+                    /*if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index - 2), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index - 2)));
                     } else {
                         Stargate.setLine(sign, done, destinations.get(index - 2));
-                    }
+                    }*/
+                	Stargate.setLine(sign, done, destinations.get(index - 2));
                 }
                 if ((index > 0) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
+                    /*if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index - 1), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index - 1)));
                     } else {
                         Stargate.setLine(sign, done, destinations.get(index - 1));
-                    }
+                    }*/
+                	Stargate.setLine(sign, done, destinations.get(index - 1));
                 }
                 if (++done <= 3) {
-                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
+                    /*if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destination, network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), ">" + destination + "<"));
                     } else {
                         Stargate.setLine(sign, done, " >" + destination + "< ");
-                    }
+                    }*/
+                	Stargate.setLine(sign, done, " >" + destination + "< ");
                 }
                 if ((max >= index + 1) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
+                    /*if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index + 1), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index + 1)));
                     } else {
                         Stargate.setLine(sign, done, destinations.get(index + 1));
-                    }
+                    }*/
+                	Stargate.setLine(sign, done, destinations.get(index + 1));
                 }
                 if ((max >= index + 2) && (++done <= 3)) {
-                    if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
+                    /*if (iConomyHandler.useiConomy() && Stargate.config.economy.freeGatesGreen) {
                         Portal dest = Portal.getByName(destinations.get(index + 2), network);
                         boolean green = Stargate.isFree(activePlayer, this, dest);
                         Stargate.setLine(sign, done, Text.of((green ? TextColors.DARK_GREEN : ""), destinations.get(index + 2)));
                     } else {
                         Stargate.setLine(sign, done, destinations.get(index + 2));
-                    }
+                    }*/
+                	Stargate.setLine(sign, done, destinations.get(index + 2));
                 }
             }
         }
@@ -1117,10 +1126,10 @@ public class Portal {
         Blox button = null;
         Portal portal = new Portal(topleft, modX, modZ, rotX, id, button, destName, name, false, network, gate, player.getUniqueId(), hidden, alwaysOn, priv, free, backwards, show, noNetwork, random, bungee);
         
-        BigDecimal cost = Stargate.getCreateCost(player, gate);
         
         // Call StargateCreateEvent
-        StargateCreateEvent cEvent = new StargateCreateEvent(player, portal, Lists.transform(event.getText().lines().get(), Text::toPlain), deny, denyMsg, cost);
+        // <<REDO THIS>>
+        StargateCreateEvent cEvent = new StargateCreateEvent(player, portal, Lists.transform(event.getText().lines().get(), Text::toPlain), deny, denyMsg, BigDecimal.ZERO);
         Sponge.getEventManager().post(cEvent);
         if (cEvent.isCancelled()) {
             return null;
@@ -1129,8 +1138,6 @@ public class Portal {
             Stargate.sendMessage(player, cEvent.getDenyReason());
             return null;
         }
-        
-        cost = cEvent.getCost();
         
         // Name & Network can be changed in the event, so do these checks here.
         if (portal.getName().length() < 1 || portal.getName().length() > 11) {
@@ -1161,6 +1168,7 @@ public class Portal {
             }
         }
         
+        /*
         if (cost.compareTo(BigDecimal.ZERO) > 0) {
             if (!Stargate.chargePlayer(player, (String) null, cost)) {
                 String inFundMsg = Stargate.getString("ecoInFunds");
@@ -1173,6 +1181,7 @@ public class Portal {
             deductMsg = Stargate.replaceVars(deductMsg, new String[] {"%cost%", "%portal%"}, new String[] {TextSerializers.FORMATTING_CODE.serialize(iConomyHandler.format(cost)), name});
             Stargate.sendMessage(player, deductMsg, false);
         }
+        */
         
         // No button on an always-open gate.
         if (!alwaysOn) {

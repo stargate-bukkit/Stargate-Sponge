@@ -29,7 +29,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
-import org.bstats.sponge.MetricsLite2;
+//import org.bstats.sponge.MetricsLite2;	//Sorry, I don't want to bother with figuring this out.
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.Sign;
@@ -108,8 +108,8 @@ public class Stargate {
     ConfigurationLoader<CommentedConfigurationNode> loader;
     @Inject
     PluginContainer container;
-    @Inject
-    MetricsLite2 metrics;
+    /*@Inject
+    MetricsLite2 metrics;*/
 
     public static Config config;
 
@@ -403,13 +403,15 @@ public class Stargate {
      * Return true if the portal is free for the player
      */
     public static boolean isFree(Player player, Portal src, Portal dest) {
+    	return true;
+    	/*
         // This gate is free
         if (src.isFree()) return true;
         // Player gets free use
         if (hasPerm(player, "stargate.free") || Stargate.hasPerm(player,  "stargate.free.use")) return true;
         // Don't charge for free destination gates
         if (dest != null && !config.economy.freeDestination && dest.isFree()) return true;
-        return false;
+        return false;*/
     }
     
     /*
@@ -512,72 +514,6 @@ public class Stargate {
         // Check for personal gate
         if (player.getUniqueId().equals(portal.getOwner()) && hasPerm(player, "stargate.destroy.personal")) return true;
         return false;
-    }
-    
-    /*
-     * Charge player for {action} if required, true on success, false if can't afford
-     */
-    public static boolean chargePlayer(Player player, String target, BigDecimal cost) {
-        // If cost is 0
-        if (cost.compareTo(BigDecimal.ZERO) == 0) return true;
-        // iConomy is disabled
-        if (!iConomyHandler.useiConomy()) return true;
-        // Charge player
-        return iConomyHandler.chargePlayer(player.getName(), target, cost);
-    }
-
-    /*
-     * Charge player for {action} if required, true on success, false if can't afford
-     */
-    public static boolean chargePlayer(Player player, UUID target, BigDecimal cost) {
-        // If cost is 0
-        if (cost.compareTo(BigDecimal.ZERO) == 0) return true;
-        // iConomy is disabled
-        if (!iConomyHandler.useiConomy()) return true;
-        // Charge player
-        return iConomyHandler.chargePlayer(player.getName(), target, cost);
-    }
-    
-    /*
-     * Determine the cost of a gate
-     */
-    public static BigDecimal getUseCost(Player player, Portal src, Portal dest) {
-        // Not using iConomy
-        if (!iConomyHandler.useiConomy()) return BigDecimal.ZERO;
-        // Portal is free
-        if (src.isFree()) return BigDecimal.ZERO;
-        // Not charging for free destinations
-        if (dest != null && !config.economy.freeDestination && dest.isFree()) return BigDecimal.ZERO;
-        // Cost is 0 if the player owns this gate and funds go to the owner
-        if (src.getGate().getToOwner() && src.getOwner().equals(player.getUniqueId())) return BigDecimal.ZERO;
-        // Player gets free gate use
-        if (hasPerm(player, "stargate.free") || hasPerm(player, "stargate.free.use")) return BigDecimal.ZERO;
-        
-        return src.getGate().getUseCost();
-    }
-    
-    /*
-     * Determine the cost to create the gate
-     */
-    public static BigDecimal getCreateCost(Player player, Gate gate) {
-        // Not using iConomy
-        if (!iConomyHandler.useiConomy()) return BigDecimal.ZERO;
-        // Player gets free gate destruction
-        if (hasPerm(player, "stargate.free") || hasPerm(player, "stargate.free.create")) return BigDecimal.ZERO;
-        
-        return gate.getCreateCost();
-    }
-    
-    /*
-     * Determine the cost to destroy the gate
-     */
-    public static BigDecimal getDestroyCost(Player player, Gate gate) {
-        // Not using iConomy
-        if (!iConomyHandler.useiConomy()) return BigDecimal.ZERO;
-        // Player gets free gate destruction
-        if (hasPerm(player, "stargate.free") || hasPerm(player, "stargate.free.destroy")) return BigDecimal.ZERO;
-        
-        return gate.getDestroyCost();
     }
     
     /*

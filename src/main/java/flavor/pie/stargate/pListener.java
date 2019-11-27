@@ -21,7 +21,7 @@
 
 package flavor.pie.stargate;
 
-import org.spongepowered.api.Sponge;
+//import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
@@ -38,9 +38,9 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.UUID;
+//import java.math.BigDecimal;
+//import java.util.Optional;
+//import java.util.UUID;
 
 public class pListener {
     @Listener
@@ -133,29 +133,6 @@ public class pListener {
             portal.teleport(player, portal, event);
             portal.close(false);
             return;
-        }
-
-        BigDecimal cost = Stargate.getUseCost(player, portal, destination);
-        if (cost.compareTo(BigDecimal.ZERO) > 0) {
-            UUID target = portal.getGate().getToOwner() ? portal.getOwner() : null;
-            if (!Stargate.chargePlayer(player, target, cost)) {
-                // Insufficient Funds
-                Stargate.sendMessage(player, "Insufficient Funds");
-                portal.close(false);
-                return;
-            }
-            String deductMsg = Stargate.getString("ecoDeduct");
-            deductMsg = Stargate.replaceVars(deductMsg, new String[] {"%cost%", "%portal%"}, new String[] {TextSerializers.FORMATTING_CODE.serialize(
-                    iConomyHandler.format(cost)), portal.getName()});
-            Stargate.sendMessage(player, deductMsg, false);
-            if (target != null) {
-                Optional<Player> p = Sponge.getServer().getPlayer(target);
-                if (p.isPresent()) {
-                    String obtainedMsg = Stargate.getString("ecoObtain");
-                    obtainedMsg = Stargate.replaceVars(obtainedMsg, new String[] {"%cost%", "%portal%"}, new String[] {TextSerializers.FORMATTING_CODE.serialize(iConomyHandler.format(cost)), portal.getName()});
-                    Stargate.sendMessage(p.get(), obtainedMsg, false);
-                }
-            }
         }
 
         Stargate.sendMessage(player, Stargate.getString("teleportMsg"), false);

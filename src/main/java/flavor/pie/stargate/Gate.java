@@ -31,7 +31,7 @@ import org.spongepowered.api.world.World;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
+//import java.math.BigDecimal;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,10 +64,6 @@ public class Gate {
     private BlockState portalBlockOpen = BlockTypes.PORTAL.getDefaultState();
     private BlockState portalBlockClosed = BlockTypes.AIR.getDefaultState();
     
-    // iConomy information
-    private BigDecimal useCost = null;
-    private BigDecimal createCost = null;
-    private BigDecimal destroyCost = null;
     private boolean toOwner = false;
 
     public Gate(Path filename, char[][] layout, HashMap<Character, BlockState> types) {
@@ -128,13 +124,6 @@ public class Gate {
             
             writeConfig(bw, "portal-open", portalBlockOpen);
             writeConfig(bw, "portal-closed", portalBlockClosed);
-            if (useCost != null)
-                writeConfig(bw, "usecost", useCost);
-            if (createCost != null)
-                writeConfig(bw, "createcost", createCost);
-            if (destroyCost != null)
-                writeConfig(bw, "destroycost", destroyCost);
-            writeConfig(bw, "toowner", toOwner);
 
             for (Character type : types.keySet()) {
                 BlockState value = types.get(type);
@@ -167,14 +156,14 @@ public class Gate {
         bw.newLine();
     }
     
-    private void writeConfig(BufferedWriter bw, String key, BigDecimal value) throws IOException {
+    /*private void writeConfig(BufferedWriter bw, String key, BigDecimal value) throws IOException {
         bw.append(String.format("%s=%f", key, value));
-    }
+    }*/
     
-    private void writeConfig(BufferedWriter bw, String key, boolean value) throws IOException {
+    /*private void writeConfig(BufferedWriter bw, String key, boolean value) throws IOException {
         bw.append(String.format("%s=%b", key, value));
         bw.newLine();
-    }
+    }*/
 
     public char[][] getLayout() {
         return layout;
@@ -225,21 +214,6 @@ public class Gate {
     
     public void setPortalBlockClosed(BlockState type) {
         portalBlockClosed = type;
-    }
-    
-    public BigDecimal getUseCost() {
-        if (useCost == null) return Stargate.config.economy.useCost;
-        return useCost;
-    }
-    
-    public BigDecimal getCreateCost() {
-        if (createCost == null) return Stargate.config.economy.createCost;
-        return createCost;
-    }
-    
-    public BigDecimal getDestroyCost() {
-        if (destroyCost == null) return Stargate.config.economy.destroyCost;
-        return destroyCost;
     }
     
     public boolean getToOwner() {
@@ -402,11 +376,7 @@ public class Gate {
 
         gate.portalBlockOpen = readConfigBlock(config, gate, file, "portal-open", gate.portalBlockOpen);
         gate.portalBlockClosed = readConfigBlock(config, gate, file, "portal-closed", gate.portalBlockClosed);
-        gate.useCost = readConfigNum(config, gate, file, "usecost", null);
-        gate.destroyCost = readConfigNum(config, gate, file, "destroycost", null);
-        gate.createCost = readConfigNum(config, gate, file, "createcost", null);
-        gate.toOwner = (config.containsKey("toowner") ? Boolean.valueOf(config.get("toowner")) : Stargate.config.economy.toOwner);
-
+        
         if (gate.getControls().length != 2) {
             Stargate.log.error("Could not load Gate " + file.getFileName() + " - Gates must have exactly 2 control points.");
             return null;
@@ -419,7 +389,7 @@ public class Gate {
         return gate;
     }
 
-    private static BigDecimal readConfigNum(HashMap<String, String> config, Gate gate, Path file, String key, BigDecimal def) {
+    /*private static BigDecimal readConfigNum(HashMap<String, String> config, Gate gate, Path file, String key, BigDecimal def) {
         if (config.containsKey(key)) {
             try {
                 return new BigDecimal(config.get(key));
@@ -428,7 +398,7 @@ public class Gate {
             }
         }
         return def;
-    }
+    }*/
     
     private static BlockState readConfigBlock(HashMap<String, String> config, Gate gate, Path file, String key, BlockState def) {
         if (config.containsKey(key)) {
