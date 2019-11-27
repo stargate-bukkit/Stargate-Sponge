@@ -62,19 +62,14 @@ public class bListener {
     // Switch to LAST order so as to come after block protection plugins (Hopefully)
     @Listener(order = Order.EARLY)
     public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player) {
-    	Stargate.log.info("OnBlockBreak called!");
         Location<World> block = event.getTransactions().get(0).getOriginal().getLocation().get();
 
         Portal portal = Portal.getByBlock(block);
         if (portal == null)
             portal = Portal.getByEntrance(block);
-        if (portal == null)  {
-        	Stargate.log.info("Catch 1");
-        	return;
-        }
+        if (portal == null)  return;
         if ((portal.getButton() != null && block.getBlockPosition().equals(portal.getButton().getBlock().getBlockPosition()))
                 || block.getBlockPosition().equals(portal.getSign().getBlockPosition())) {
-        	Stargate.log.info("Catch 2");
             event.setCancelled(true);
         }
         boolean deny = false;
@@ -108,15 +103,8 @@ public class bListener {
     @Listener
     @Include({ChangeBlockEvent.Decay.class, ChangeBlockEvent.Modify.class, ChangeBlockEvent.Break.class})
     public void onBlockPhysics(ChangeBlockEvent event) {
-    	Stargate.log.info("onBlockPhysics called!"); 
-        if (!(event.getCause().root() instanceof Player)) {
-        	Stargate.log.info("^--- cause != player"); 
-        	return;
-        }
-        if (event.getCause().contains(Stargate.stargateContainer)) {
-        	Stargate.log.info("^--- cause containst stargateContainer"); 
-        	return;
-        }
+        if (!(event.getCause().root() instanceof Player)) return;
+        if (event.getCause().contains(Stargate.stargateContainer)) return;
         for (Transaction<BlockSnapshot> trans : event.getTransactions()) {
             if (!trans.getOriginal().getLocation().isPresent()) return;
             Location<World> block = trans.getOriginal().getLocation().get();
@@ -139,7 +127,6 @@ public class bListener {
 
     @Listener
     public void onBlockFromTo(ChangeBlockEvent.Place event, @First LocatableBlock block) {
-    	Stargate.log.info("onBlockFromTo called!");
         Portal portal = Portal.getByEntrance(block.getLocation());
 
         if (portal != null) {
@@ -168,7 +155,6 @@ public class bListener {
     @Listener(order = Order.LAST)
     @Exclude(ChangeBlockEvent.Post.class)
     public void onBreakPortal(ChangeBlockEvent event) {
-    	Stargate.log.info("onBreakPortal called!");
         if (event.getCause().contains(Stargate.stargateContainer)) return;
         for (Transaction<BlockSnapshot> trans : event.getTransactions()) {
             Optional<Location<World>> loc = trans.getOriginal().getLocation();
