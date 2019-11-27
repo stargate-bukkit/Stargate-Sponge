@@ -42,3 +42,5 @@ This plugin uses bStats, which collects data about your server. This data is in 
 
 0.1 - Ported verbatim.
 0.1.1 - Fixed some bugs I missed.
+0.1.5 - Fixed not being able to load the plugin properly.
+0.1.6 - Fixed not being able to destroy stargates.
