@@ -1,17 +1,11 @@
 package flavor.pie.stargate;
 
-import java.math.BigDecimal;
-
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import com.google.common.reflect.TypeToken;
-
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 @ConfigSerializable
 public class Config {
@@ -44,25 +38,6 @@ public class Config {
         @Setting("sort-lists")
         public boolean sortLists = false;
     }
-
-    /*
-    @ConfigSerializable
-    public static class EconomySection {
-        @Setting
-        public boolean enable = false;
-        @Setting("create-cost")
-        public BigDecimal createCost = BigDecimal.ZERO;
-        @Setting("destroy-cost")
-        public BigDecimal destroyCost = BigDecimal.ZERO;
-        @Setting("use-cost")
-        public BigDecimal useCost = BigDecimal.ZERO;
-        @Setting("to-owner")
-        public boolean toOwner = false;
-        @Setting("free-destination")
-        public boolean freeDestination = true;
-        @Setting("free-gates-green")
-        public boolean freeGatesGreen = true;
-    }*/
 
     @ConfigSerializable
     public static class Old {
@@ -123,32 +98,7 @@ public class Config {
             pSection.signColor = signColor;
             pSection.sortLists = sortLists;
             config.portal = pSection;
-            /*EconomySection eSection = new EconomySection();
-            eSection.createCost = new BigDecimal(createCost);
-            eSection.destroyCost = new BigDecimal(destroyCost);
-            eSection.enable = useIconomy;
-            eSection.freeDestination = chargeFreeDestination;
-            eSection.freeGatesGreen = freeGatesGreen;
-            eSection.toOwner = toOwner;
-            eSection.useCost = new BigDecimal(useCost);
-            config.economy = eSection;*/
             return config;
-        }
-    }
-
-    public static class BigDecimalSerializer implements TypeSerializer<BigDecimal> {
-        @Override
-        public void serialize(TypeToken<?> type, BigDecimal obj, ConfigurationNode value) throws ObjectMappingException {
-            value.setValue(obj.toPlainString());
-        }
-
-        @Override
-        public BigDecimal deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-            try {
-                return new BigDecimal(value.getString());
-            } catch (NumberFormatException e) {
-                throw new ObjectMappingException(e);
-            }
         }
     }
 }

@@ -51,7 +51,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.io.BufferedWriter;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -1129,7 +1128,7 @@ public class Portal {
         
         // Call StargateCreateEvent
         // <<REDO THIS>>
-        StargateCreateEvent cEvent = new StargateCreateEvent(player, portal, Lists.transform(event.getText().lines().get(), Text::toPlain), deny, denyMsg, BigDecimal.ZERO);
+        StargateCreateEvent cEvent = new StargateCreateEvent(player, portal, Lists.transform(event.getText().lines().get(), Text::toPlain), deny, denyMsg);
         Sponge.getEventManager().post(cEvent);
         if (cEvent.isCancelled()) {
             return null;

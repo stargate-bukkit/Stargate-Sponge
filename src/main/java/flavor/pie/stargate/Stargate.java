@@ -126,10 +126,6 @@ public class Stargate {
     @Listener
     public void onEnable(GameStartedServerEvent e) throws IOException, ObjectMappingException {
         stargateContainer = container;
-
-        if (!loader.getDefaultOptions().acceptsType(BigDecimal.class)) {
-            loader.getDefaultOptions().getSerializers().registerType(TypeToken.of(BigDecimal.class), new Config.BigDecimalSerializer());
-        }
         
         log = logger;
         Stargate.stargate = this;

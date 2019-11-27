@@ -21,7 +21,6 @@
 
 package flavor.pie.stargate;
 
-//import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
@@ -37,10 +36,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-//import java.math.BigDecimal;
-//import java.util.Optional;
-//import java.util.UUID;
 
 public class pListener {
     @Listener

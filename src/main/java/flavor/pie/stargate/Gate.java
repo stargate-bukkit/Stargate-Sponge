@@ -31,7 +31,6 @@ import org.spongepowered.api.world.World;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-//import java.math.BigDecimal;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;

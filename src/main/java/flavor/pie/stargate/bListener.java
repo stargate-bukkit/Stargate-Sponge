@@ -36,12 +36,9 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.scheduler.Task;
-//import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.math.BigDecimal;
 import java.util.Optional;
 
 public class bListener {
@@ -82,7 +79,7 @@ public class bListener {
         }
 
         // <<REDO THIS>>
-        StargateDestroyEvent dEvent = new StargateDestroyEvent(portal, player, deny, denyMsg, BigDecimal.ZERO);
+        StargateDestroyEvent dEvent = new StargateDestroyEvent(portal, player, deny, denyMsg);
         Sponge.getEventManager().post(dEvent);
         if (dEvent.isCancelled()) {
         	Stargate.log.info("Catch 4");
