@@ -1,6 +1,6 @@
 # Stargate-Sponge
 
-Dinnerbone and Sturmeh originally created this plugin for hMod. It was ported to Bukkit by Drakia, and now I present to you a port for Sponge!
+Dinnerbone and Sturmeh originally created this plugin for hMod. It was ported to Bukkit by Drakia and to Sponge by pie_flavor. Now fixed by me! 
 
 ![](http://i.imgur.com/ovwMQGN.png) ![](http://i.imgur.com/TBgp0v0.png)  
 
@@ -10,7 +10,7 @@ Stargates are portals that can be created for teleportation across long distance
 
 * Stargate has only two commands, and they're for plugin info or reloading. The idea is to aid immersion by making the portal system completely commandless.  
 * Stargate is lightweight. Not only do portals take up a miniscule amount of memory, but all portal updates are throttled, and may be split over multiple ticks if necessary.
-* Stargate can optionally integrate with the server's economy in order to provide prices for creating, using, and breaking portals.
+* ~~Stargate can optionally integrate with the server's economy in order to provide prices for creating, using, and breaking portals.~~
 * Portals can be created in many different styles. You can use the traditional dialer, you can lock it to one location, or you can keep it always on. You can make it backwards, you can hide it from the dialers, you can make it private to only you. You can even hide the network name from the sign, or make the destination random!
 * Portals can also be created in many different layouts. The one shipped with the plugin is the traditional 'nether portal' layout, but you can absolutely make your own! Scissors and glue not included.
 * Stargate has multi-language support. It ships with some popular languages like French and Spanish, and you can easily add your own.
