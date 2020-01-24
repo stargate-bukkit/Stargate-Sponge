@@ -41,4 +41,5 @@ This plugin uses bStats, which collects data about your server. This data is in 
 ## Changelog
 
 0.1 - Ported verbatim.
+
 0.1.1 - Fixed some bugs I missed.
