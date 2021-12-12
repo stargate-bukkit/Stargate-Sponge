@@ -1,6 +1,7 @@
 # Stargate-Sponge
 
-Dinnerbone and Sturmeh originally created this plugin for hMod. It was ported to Bukkit by Drakia and to Sponge by pie_flavor. Now fixed by me! 
+Dinnerbone and Sturmeh originally created this plugin for hMod.
+It was ported to Bukkit by Drakia and to Sponge by pie_flavor, modified by CZThomasCZ, and has now been inherited by the Stargate-Bukkit project.
 
 ![](http://i.imgur.com/ovwMQGN.png) ![](http://i.imgur.com/TBgp0v0.png)  
 
