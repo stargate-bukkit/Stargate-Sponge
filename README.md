@@ -1,7 +1,7 @@
 > ### **Documentation:** __**[Link](https://github.com/stargate-bukkit/Stargate-Bukkit/wiki)**__<br>
 > ### **Support Discord** __**[Link](https://discord.gg/mTaHuK6BVa)**__
 
-# Stargate-Bukkit
+# Stargate-Sponge
 `Supporting Sponge API Version 7`
 
 > ALPHA RELEASE!<br>
