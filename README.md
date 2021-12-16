@@ -20,7 +20,7 @@ Stargate-Bukkit is the original MineCraft portal plugin; it existed for as long 
 Originally conceived and written by Dinnerbone, this project is now maintained by [several individual developers](https://github.com/stargate-rewritten/Stargate-Sponge/graphs/contributors).<br>
 Notable contributions to the Sponge ecosystem have been made by this project's upstream developers, theDgtl and pie-flavor.
 
-In 2022 [Stargate-Rewritten](https://github.com/stargate-rewritten/Stargate-Bukkit), by Thorinwasher and EpicKnarvik97, is slated to be ported to the sponge ecosystem.
+In 2022 [Stargate-Rewritten](https://github.com/stargate-rewritten/Stargate-Bukkit), by Thorinwasher and EpicKnarvik97, is slated to be ported to the sponge ecosystem.<br>
 When that port is available, this repository will be used to host it.
 
 ## Features
